@@ -1,0 +1,17 @@
+class Automovil:
+    def __init__(self, marca, modelo, color):
+        self.marca = marca
+        self.modelo = modelo
+        self.color = color
+
+    def encender(self):
+        print("Automóvil encendido")
+
+    def mostrar_datos(self):
+        print(self.marca, self.modelo, self.color)
+
+auto1 = Automovil("Toyota", "Corolla", "Blanco")
+auto2 = Automovil("Chevrolet", "Spark", "Rojo")
+
+auto1.mostrar_datos()
+auto2.mostrar_datos()
