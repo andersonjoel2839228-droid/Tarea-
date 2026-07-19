@@ -1,34 +1,23 @@
-# Archivo principal del programa
-
 from modelos.producto import Producto
 from modelos.cliente import Cliente
 from servicios.restaurante import Restaurante
 
-# Crear restaurante
-restaurante = Restaurante("Restaurante Sabor Casero")
+restaurante = Restaurante("Restaurante Sabor Latino")
 
-# Crear productos
-producto1 = Producto("Arroz con pollo", 6.50, "Plato fuerte")
-producto2 = Producto("Jugo de naranja", 2.00, "Bebida")
-producto3 = Producto("Helado", 1.75, "Postre")
+producto1 = Producto("Hamburguesa", 5.50, 20, True)
+producto2 = Producto("Pizza", 8.00, 10, True)
 
-# Crear clientes
-cliente1 = Cliente("Carlos Pérez", "1723456789", "0991234567")
-cliente2 = Cliente("María López", "1712345678", "0987654321")
+cliente1 = Cliente("Juan Pérez", 20, "0991111111", True)
+cliente2 = Cliente("María López", 22, "0992222222", True)
 
-# Agregar productos
 restaurante.agregar_producto(producto1)
 restaurante.agregar_producto(producto2)
-restaurante.agregar_producto(producto3)
 
-# Agregar clientes
 restaurante.agregar_cliente(cliente1)
 restaurante.agregar_cliente(cliente2)
 
-# Mostrar información
-print("=================================")
 print(restaurante.nombre)
-print("=================================")
-
+print("----------------------------")
 restaurante.mostrar_productos()
+print("----------------------------")
 restaurante.mostrar_clientes()
