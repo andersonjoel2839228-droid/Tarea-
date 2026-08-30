@@ -1,36 +1,52 @@
 class Producto:
-    """Representa un producto del restaurante."""
+    def __init__(self, codigo: str, nombre: str, precio: float, stock: int):
+        if not codigo.strip():
+            raise ValueError("El código no puede estar vacío.")
 
-    def __init__(
-        self,
-        nombre: str,
-        precio: float,
-        categoria: str
-    ) -> None:
         if not nombre.strip():
-            raise ValueError("El nombre del producto no puede estar vacío.")
+            raise ValueError("El nombre no puede estar vacío.")
 
-        if precio <= 0:
-            raise ValueError("El precio debe ser mayor que cero.")
+        if precio < 0:
+            raise ValueError("El precio no puede ser negativo.")
 
-        if not categoria.strip():
-            raise ValueError("La categoría no puede estar vacía.")
+        if stock < 0:
+            raise ValueError("El stock no puede ser negativo.")
 
-        self.nombre = nombre.strip()
+        self.codigo = codigo
+        self.nombre = nombre
         self.precio = precio
-        self.categoria = categoria.strip()
+        self.stock = stock
 
-    def to_dict(self) -> dict[str, str | float]:
-        """Convierte el producto en un diccionario para guardarlo en JSON."""
+    def vender(self, cantidad: int) -> None:
+        if cantidad <= 0:
+            raise ValueError("La cantidad debe ser mayor que cero.")
+
+        if cantidad > self.stock:
+            raise ValueError("Stock insuficiente.")
+
+        self.stock -= cantidad
+
+    def convertir_a_diccionario(self) -> dict:
         return {
+            "codigo": self.codigo,
             "nombre": self.nombre,
             "precio": self.precio,
-            "categoria": self.categoria
+            "stock": self.stock
         }
+
+    @classmethod
+    def desde_diccionario(cls, datos: dict):
+        return cls(
+            datos["codigo"],
+            datos["nombre"],
+            datos["precio"],
+            datos["stock"]
+        )
 
     def __str__(self) -> str:
         return (
-            f"Producto: {self.nombre} | "
+            f"Código: {self.codigo} | "
+            f"Nombre: {self.nombre} | "
             f"Precio: ${self.precio:.2f} | "
-            f"Categoría: {self.categoria}"
+            f"Stock: {self.stock}"
         )
