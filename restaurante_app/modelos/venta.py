@@ -1,47 +1,12 @@
 class Venta:
-    def __init__(
-        self,
-        usuario_id: str,
-        producto_codigo: str,
-        cantidad: int
-    ):
-        if not usuario_id.strip():
-            raise ValueError(
-                "La identificación del usuario no puede estar vacía."
-            )
-
-        if not producto_codigo.strip():
-            raise ValueError(
-                "El código del producto no puede estar vacío."
-            )
-
-        if cantidad <= 0:
-            raise ValueError(
-                "La cantidad debe ser mayor que cero."
-            )
-
-        self.usuario_id = usuario_id
-        self.producto_codigo = producto_codigo
+    def __init__(self, identificacion_usuario, codigo_producto, cantidad):
+        self.identificacion_usuario = identificacion_usuario
+        self.codigo_producto = codigo_producto
         self.cantidad = cantidad
 
-    def convertir_a_diccionario(self) -> dict:
-        return {
-            "usuario_id": self.usuario_id,
-            "producto_codigo": self.producto_codigo,
-            "cantidad": self.cantidad
-        }
-
-    @classmethod
-    def desde_diccionario(cls, datos: dict):
-        return cls(
-            datos["usuario_id"],
-            datos["producto_codigo"],
-            datos["cantidad"]
-        )
-
-    def __str__(self) -> str:
+    def __str__(self):
         return (
-            f"Usuario: {self.usuario_id} | "
-            f"Producto: {self.producto_codigo} | "
+            f"Usuario: {self.identificacion_usuario} - "
+            f"Producto: {self.codigo_producto} - "
             f"Cantidad: {self.cantidad}"
         )

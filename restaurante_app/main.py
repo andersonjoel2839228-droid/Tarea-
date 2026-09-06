@@ -1,247 +1,115 @@
+from modelos.producto import Producto
+from modelos.usuario import Usuario
 from servicios.restaurante import Restaurante
 
 
-def mostrar_menu() -> None:
-    print("\n========== RESTAURANTE APP ==========")
-    print("1. Registrar producto")
-    print("2. Listar productos")
-    print("3. Registrar usuario")
-    print("4. Listar usuarios")
-    print("5. Vender producto")
-    print("6. Consultar ventas de un usuario")
-    print("7. Listar ventas")
-    print("8. Salir")
-    print("=====================================")
+def mostrar_menu():
+    print("\n===== RESTAURANTE APP =====")
+    print("1. Registrar usuario")
+    print("2. Registrar producto")
+    print("3. Buscar usuario")
+    print("4. Buscar producto")
+    print("5. Realizar venta")
+    print("6. Consultar ventas de usuario")
+    print("7. Listar usuarios")
+    print("8. Listar productos")
+    print("9. Listar ventas")
+    print("0. Salir")
 
 
-def registrar_producto(restaurante: Restaurante) -> None:
-    try:
-        codigo = input("Ingrese el código del producto: ")
-        nombre = input("Ingrese el nombre del producto: ")
-        precio = float(input("Ingrese el precio: "))
-        stock = int(input("Ingrese el stock: "))
+restaurante = Restaurante()
 
-        if restaurante.registrar_producto(
-            codigo,
-            nombre,
-            precio,
-            stock
-        ):
-            print("Producto registrado correctamente.")
-        else:
-            print("Ya existe un producto con ese código.")
+while True:
 
-    except ValueError as error:
-        print(f"Error: {error}")
+    mostrar_menu()
 
+    opcion = input("Seleccione una opción: ")
 
-def listar_productos(restaurante: Restaurante) -> None:
-    productos = restaurante.listar_productos()
+    if opcion == "1":
+        identificacion = input("Identificación: ")
+        nombre = input("Nombre: ")
 
-    if not productos:
-        print("No existen productos registrados.")
-        return
+        usuario = Usuario(identificacion, nombre)
 
-    print("\n---------- PRODUCTOS ----------")
-
-    for producto in productos:
-        print(producto)
-
-
-def registrar_usuario(restaurante: Restaurante) -> None:
-    try:
-        identificacion = input(
-            "Ingrese la identificación del usuario: "
-        )
-
-        nombre = input("Ingrese el nombre del usuario: ")
-
-        if restaurante.registrar_usuario(
-            identificacion,
-            nombre
-        ):
+        if restaurante.registrar_usuario(usuario):
             print("Usuario registrado correctamente.")
+
+    elif opcion == "2":
+        codigo = input("Código: ")
+        nombre = input("Nombre: ")
+        precio = float(input("Precio: "))
+        stock = int(input("Stock: "))
+
+        producto = Producto(codigo, nombre, precio, stock)
+
+        if restaurante.registrar_producto(producto):
+            print("Producto registrado correctamente.")
+
+    elif opcion == "3":
+        identificacion = input("Ingrese la identificación: ")
+
+        usuario = restaurante.buscar_usuario(identificacion)
+
+        if usuario:
+            print("Usuario encontrado:")
+            print(usuario)
         else:
-            print(
-                "Ya existe un usuario con esa identificación."
-            )
+            print("Usuario no encontrado.")
 
-    except ValueError as error:
-        print(f"Error: {error}")
+    elif opcion == "4":
+        codigo = input("Ingrese el código del producto: ")
 
+        producto = restaurante.buscar_producto(codigo)
 
-def listar_usuarios(restaurante: Restaurante) -> None:
-    usuarios = restaurante.listar_usuarios()
+        if producto:
+            print("Producto encontrado:")
+            print(producto)
+        else:
+            print("Producto no encontrado.")
 
-    if not usuarios:
-        print("No existen usuarios registrados.")
-        return
+    elif opcion == "5":
+        identificacion = input("Identificación del usuario: ")
+        codigo = input("Código del producto: ")
+        cantidad = int(input("Cantidad: "))
 
-    print("\n---------- USUARIOS ----------")
-
-    for usuario in usuarios:
-        print(usuario)
-
-
-def vender_producto(restaurante: Restaurante) -> None:
-    try:
-        identificacion = input(
-            "Ingrese la identificación del usuario: "
-        )
-
-        codigo = input(
-            "Ingrese el código del producto: "
-        )
-
-        cantidad = int(
-            input("Ingrese la cantidad a comprar: ")
-        )
-
-        if restaurante.vender_producto(
-            codigo,
+        if restaurante.realizar_venta(
             identificacion,
+            codigo,
             cantidad
         ):
-            print("\nVenta registrada correctamente.")
+            print("Venta realizada correctamente.")
+            print("Stock actualizado.")
 
-            producto = restaurante.buscar_producto(codigo)
+    elif opcion == "6":
+        identificacion = input("Identificación del usuario: ")
 
-            if producto is not None:
-                print(
-                    f"Stock restante: {producto.stock}"
-                )
+        ventas = restaurante.consultar_ventas_usuario(
+            identificacion
+        )
 
+        if ventas:
+            print("\nVentas del usuario:")
+
+            for venta in ventas:
+                print(venta)
         else:
-            print(
-                "No se pudo realizar la venta. "
-                "Verifique usuario, producto, cantidad o stock."
-            )
+            print("No existen ventas para este usuario.")
 
-    except ValueError as error:
-        print(f"Error: {error}")
+    elif opcion == "7":
+        print("\n===== USUARIOS =====")
+        restaurante.listar_usuarios()
 
+    elif opcion == "8":
+        print("\n===== PRODUCTOS =====")
+        restaurante.listar_productos()
 
-def consultar_ventas_usuario(
-    restaurante: Restaurante
-) -> None:
+    elif opcion == "9":
+        print("\n===== VENTAS =====")
+        restaurante.listar_ventas()
 
-    identificacion = input(
-        "Ingrese la identificación del usuario: "
-    )
+    elif opcion == "0":
+        print("Programa finalizado.")
+        break
 
-    usuario = restaurante.buscar_usuario(
-        identificacion
-    )
-
-    if usuario is None:
-        print("El usuario no existe.")
-        return
-
-    ventas = restaurante.consultar_ventas_usuario(
-        identificacion
-    )
-
-    if not ventas:
-        print(
-            "El usuario no tiene ventas registradas."
-        )
-        return
-
-    print(
-        f"\nVentas del usuario: {usuario.nombre}"
-    )
-
-    for venta in ventas:
-
-        producto = restaurante.buscar_producto(
-            venta.producto_codigo
-        )
-
-        if producto is not None:
-            print(
-                f"Producto: {producto.nombre} | "
-                f"Código: {producto.codigo} | "
-                f"Cantidad: {venta.cantidad}"
-            )
-        else:
-            print(venta)
-
-
-def listar_ventas(restaurante: Restaurante) -> None:
-    ventas = restaurante.listar_ventas()
-
-    if not ventas:
-        print("No existen ventas registradas.")
-        return
-
-    print("\n---------- VENTAS ----------")
-
-    for venta in ventas:
-
-        producto = restaurante.buscar_producto(
-            venta.producto_codigo
-        )
-
-        usuario = restaurante.buscar_usuario(
-            venta.usuario_id
-        )
-
-        if producto is not None:
-            nombre_producto = producto.nombre
-        else:
-            nombre_producto = "Producto no encontrado"
-
-        if usuario is not None:
-            nombre_usuario = usuario.nombre
-        else:
-            nombre_usuario = "Usuario no encontrado"
-
-        print(
-            f"Usuario: {nombre_usuario} | "
-            f"Producto: {nombre_producto} | "
-            f"Cantidad: {venta.cantidad}"
-        )
-
-
-def main() -> None:
-    restaurante = Restaurante()
-
-    while True:
-
-        mostrar_menu()
-
-        opcion = input(
-            "Seleccione una opción: "
-        )
-
-        if opcion == "1":
-            registrar_producto(restaurante)
-
-        elif opcion == "2":
-            listar_productos(restaurante)
-
-        elif opcion == "3":
-            registrar_usuario(restaurante)
-
-        elif opcion == "4":
-            listar_usuarios(restaurante)
-
-        elif opcion == "5":
-            vender_producto(restaurante)
-
-        elif opcion == "6":
-            consultar_ventas_usuario(restaurante)
-
-        elif opcion == "7":
-            listar_ventas(restaurante)
-
-        elif opcion == "8":
-            print("Programa finalizado.")
-            break
-
-        else:
-            print("Opción no válida.")
-
-
-if __name__ == "__main__":
-    main()
+    else:
+        print("Opción no válida.")

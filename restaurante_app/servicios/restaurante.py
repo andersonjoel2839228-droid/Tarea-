@@ -7,251 +7,188 @@ from servicios.archivo_servicio import ArchivoServicio
 class Restaurante:
 
     def __init__(self):
-        self._productos: list[Producto] = []
-        self._usuarios: list[Usuario] = []
-        self._ventas: list[Venta] = []
+        self.productos = []
+        self.usuarios = []
+        self.ventas = []
 
-        self._ruta_productos = "datos/productos.json"
-        self._ruta_usuarios = "datos/usuarios.json"
-        self._ruta_ventas = "datos/ventas.json"
+        # Índices para mejorar las búsquedas
+        self.productos_por_codigo = {}
+        self.usuarios_por_id = {}
+        self.ventas_por_usuario = {}
+
+        self.ruta_productos = "datos/productos.json"
+        self.ruta_usuarios = "datos/usuarios.json"
+        self.ruta_ventas = "datos/ventas.json"
 
         self.cargar_datos()
+        self.reconstruir_indices()
 
-    # =========================
-    # PRODUCTOS
-    # =========================
+    def cargar_datos(self):
+        datos_productos = ArchivoServicio.cargar(self.ruta_productos)
 
-    def registrar_producto(
-        self,
-        codigo: str,
-        nombre: str,
-        precio: float,
-        stock: int
-    ) -> bool:
+        for dato in datos_productos:
+            producto = Producto(
+                dato["codigo"],
+                dato["nombre"],
+                dato["precio"],
+                dato["stock"]
+            )
+            self.productos.append(producto)
 
-        if self.buscar_producto(codigo) is not None:
+        datos_usuarios = ArchivoServicio.cargar(self.ruta_usuarios)
+
+        for dato in datos_usuarios:
+            usuario = Usuario(
+                dato["identificacion"],
+                dato["nombre"]
+            )
+            self.usuarios.append(usuario)
+
+        datos_ventas = ArchivoServicio.cargar(self.ruta_ventas)
+
+        for dato in datos_ventas:
+            venta = Venta(
+                dato["identificacion_usuario"],
+                dato["codigo_producto"],
+                dato["cantidad"]
+            )
+            self.ventas.append(venta)
+
+    def reconstruir_indices(self):
+        self.productos_por_codigo = {}
+        self.usuarios_por_id = {}
+        self.ventas_por_usuario = {}
+
+        for producto in self.productos:
+            self.productos_por_codigo[producto.codigo] = producto
+
+        for usuario in self.usuarios:
+            self.usuarios_por_id[usuario.identificacion] = usuario
+
+        for venta in self.ventas:
+            if venta.identificacion_usuario not in self.ventas_por_usuario:
+                self.ventas_por_usuario[venta.identificacion_usuario] = []
+
+            self.ventas_por_usuario[venta.identificacion_usuario].append(venta)
+
+    def buscar_producto(self, codigo):
+        return self.productos_por_codigo.get(codigo)
+
+    def buscar_usuario(self, identificacion):
+        return self.usuarios_por_id.get(identificacion)
+
+    def consultar_ventas_usuario(self, identificacion):
+        return self.ventas_por_usuario.get(identificacion, [])
+
+    def registrar_producto(self, producto):
+        if producto.codigo in self.productos_por_codigo:
+            print("El código del producto ya existe.")
             return False
 
-        producto = Producto(
-            codigo,
-            nombre,
-            precio,
-            stock
-        )
+        self.productos.append(producto)
+        self.productos_por_codigo[producto.codigo] = producto
 
-        self._productos.append(producto)
         self.guardar_productos()
 
         return True
 
-    def buscar_producto(
-        self,
-        codigo: str
-    ) -> Producto | None:
-
-        for producto in self._productos:
-            if producto.codigo == codigo:
-                return producto
-
-        return None
-
-    def listar_productos(self) -> list[Producto]:
-        return self._productos
-
-    def guardar_productos(self) -> None:
-        datos = []
-
-        for producto in self._productos:
-            datos.append(
-                producto.convertir_a_diccionario()
-            )
-
-        ArchivoServicio.guardar(
-            self._ruta_productos,
-            datos
-        )
-
-    # =========================
-    # USUARIOS
-    # =========================
-
-    def registrar_usuario(
-        self,
-        identificacion: str,
-        nombre: str
-    ) -> bool:
-
-        if self.buscar_usuario(identificacion) is not None:
+    def registrar_usuario(self, usuario):
+        if usuario.identificacion in self.usuarios_por_id:
+            print("La identificación ya existe.")
             return False
 
-        usuario = Usuario(
-            identificacion,
-            nombre
-        )
+        self.usuarios.append(usuario)
+        self.usuarios_por_id[usuario.identificacion] = usuario
 
-        self._usuarios.append(usuario)
         self.guardar_usuarios()
 
         return True
 
-    def buscar_usuario(
-        self,
-        identificacion: str
-    ) -> Usuario | None:
+    def realizar_venta(self, identificacion_usuario, codigo_producto, cantidad):
 
-        for usuario in self._usuarios:
-            if usuario.identificacion == identificacion:
-                return usuario
-
-        return None
-
-    def listar_usuarios(self) -> list[Usuario]:
-        return self._usuarios
-
-    def guardar_usuarios(self) -> None:
-        datos = []
-
-        for usuario in self._usuarios:
-            datos.append(
-                usuario.convertir_a_diccionario()
-            )
-
-        ArchivoServicio.guardar(
-            self._ruta_usuarios,
-            datos
-        )
-
-    # =========================
-    # VENTAS
-    # =========================
-
-    def vender_producto(
-        self,
-        codigo_producto: str,
-        identificacion_usuario: str,
-        cantidad: int
-    ) -> bool:
-
-        usuario = self.buscar_usuario(
-            identificacion_usuario
-        )
-
-        producto = self.buscar_producto(
-            codigo_producto
-        )
+        usuario = self.usuarios_por_id.get(identificacion_usuario)
+        producto = self.productos_por_codigo.get(codigo_producto)
 
         if usuario is None:
+            print("El usuario no existe.")
             return False
 
         if producto is None:
+            print("El producto no existe.")
             return False
 
         if cantidad <= 0:
+            print("La cantidad debe ser mayor que cero.")
             return False
 
         if producto.stock < cantidad:
+            print("No hay suficiente stock.")
             return False
 
+        producto.stock -= cantidad
+
         venta = Venta(
-            usuario.identificacion,
-            producto.codigo,
+            identificacion_usuario,
+            codigo_producto,
             cantidad
         )
 
-        self._ventas.append(venta)
+        self.ventas.append(venta)
 
-        producto.vender(cantidad)
+        if identificacion_usuario not in self.ventas_por_usuario:
+            self.ventas_por_usuario[identificacion_usuario] = []
 
-        self.guardar_ventas()
+        self.ventas_por_usuario[identificacion_usuario].append(venta)
+
         self.guardar_productos()
+        self.guardar_ventas()
 
         return True
 
-    def consultar_ventas_usuario(
-        self,
-        identificacion_usuario: str
-    ) -> list[Venta]:
-
-        ventas_usuario: list[Venta] = []
-
-        for venta in self._ventas:
-            if venta.usuario_id == identificacion_usuario:
-                ventas_usuario.append(venta)
-
-        return ventas_usuario
-
-    def listar_ventas(self) -> list[Venta]:
-        return self._ventas
-
-    def guardar_ventas(self) -> None:
+    def guardar_productos(self):
         datos = []
 
-        for venta in self._ventas:
-            datos.append(
-                venta.convertir_a_diccionario()
-            )
+        for producto in self.productos:
+            datos.append({
+                "codigo": producto.codigo,
+                "nombre": producto.nombre,
+                "precio": producto.precio,
+                "stock": producto.stock
+            })
 
-        ArchivoServicio.guardar(
-            self._ruta_ventas,
-            datos
-        )
+        ArchivoServicio.guardar(self.ruta_productos, datos)
 
-    # =========================
-    # CARGAR DATOS
-    # =========================
+    def guardar_usuarios(self):
+        datos = []
 
-    def cargar_datos(self) -> None:
+        for usuario in self.usuarios:
+            datos.append({
+                "identificacion": usuario.identificacion,
+                "nombre": usuario.nombre
+            })
 
-        # Cargar productos
-        datos_productos = ArchivoServicio.cargar(
-            self._ruta_productos
-        )
+        ArchivoServicio.guardar(self.ruta_usuarios, datos)
 
-        for datos in datos_productos:
-            try:
-                producto = Producto.desde_diccionario(
-                    datos
-                )
+    def guardar_ventas(self):
+        datos = []
 
-                self._productos.append(producto)
+        for venta in self.ventas:
+            datos.append({
+                "identificacion_usuario": venta.identificacion_usuario,
+                "codigo_producto": venta.codigo_producto,
+                "cantidad": venta.cantidad
+            })
 
-            except (KeyError, ValueError) as error:
-                print(
-                    f"Error al cargar producto: {error}"
-                )
+        ArchivoServicio.guardar(self.ruta_ventas, datos)
 
-        # Cargar usuarios
-        datos_usuarios = ArchivoServicio.cargar(
-            self._ruta_usuarios
-        )
+    def listar_productos(self):
+        for producto in self.productos:
+            print(producto)
 
-        for datos in datos_usuarios:
-            try:
-                usuario = Usuario.desde_diccionario(
-                    datos
-                )
+    def listar_usuarios(self):
+        for usuario in self.usuarios:
+            print(usuario)
 
-                self._usuarios.append(usuario)
-
-            except (KeyError, ValueError) as error:
-                print(
-                    f"Error al cargar usuario: {error}"
-                )
-
-        # Cargar ventas
-        datos_ventas = ArchivoServicio.cargar(
-            self._ruta_ventas
-        )
-
-        for datos in datos_ventas:
-            try:
-                venta = Venta.desde_diccionario(
-                    datos
-                )
-
-                self._ventas.append(venta)
-
-            except (KeyError, ValueError) as error:
-                print(
-                    f"Error al cargar venta: {error}"
-                )
+    def listar_ventas(self):
+        for venta in self.ventas:
+            print(venta)
