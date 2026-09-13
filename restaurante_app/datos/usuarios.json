@@ -1,6 +1,4 @@
 [
-    {
-        "identificacion": "0102030405",
-        "nombre": "juan perez"
-    }
+    {"usuario": "admin", "password": "1234"},
+    {"usuario": "user", "password": "abcd"}
 ]

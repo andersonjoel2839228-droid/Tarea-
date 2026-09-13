@@ -1,7 +1,4 @@
 class Usuario:
-    def __init__(self, identificacion, nombre):
-        self.identificacion = identificacion
-        self.nombre = nombre
-
-    def __str__(self):
-        return f"{self.identificacion} - {self.nombre}"
+    def __init__(self, usuario, password):
+        self.usuario = usuario
+        self.password = password
