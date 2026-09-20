@@ -1,5 +1,7 @@
 [
-    {"nombre": "Hamburguesa", "precio": 5.5, "stock": 10},
-    {"nombre": "Pizza", "precio": 8.0, "stock": 5},
-    {"nombre": "Gaseosa", "precio": 1.5, "stock": 20}
+    {
+        "id": "1",
+        "nombre": "pizza",
+        "precio": "10"
+    }
 ]

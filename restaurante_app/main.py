@@ -3,21 +3,15 @@ from servicios.restaurante_servicio import RestauranteServicio
 from ui.login_view import LoginView
 from ui.main_view import MainView
 
-def main():
-    root = tk.Tk()
-    root.title("Restaurante App")
+def iniciar():
+    MainView(root, servicio)
 
-    servicio = RestauranteServicio()
+root = tk.Tk()
+root.title("Restaurante App")
+root.geometry("700x400")
 
-    def mostrar_main():
-        MainView(root, servicio, mostrar_login)
+servicio = RestauranteServicio()
 
-    def mostrar_login():
-        LoginView(root, servicio, mostrar_main)
+LoginView(root, servicio, iniciar)
 
-    mostrar_login()
-
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+root.mainloop()

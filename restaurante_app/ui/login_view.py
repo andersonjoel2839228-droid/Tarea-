@@ -1,16 +1,15 @@
 import tkinter as tk
+from tkinter import messagebox
 
 class LoginView:
 
-    def __init__(self, root, servicio, mostrar_main):
+    def __init__(self, root, servicio, on_login):
         self.root = root
         self.servicio = servicio
-        self.mostrar_main = mostrar_main
+        self.on_login = on_login
 
         self.frame = tk.Frame(root)
-        self.frame.pack()
-
-        tk.Label(self.frame, text="LOGIN").pack()
+        self.frame.pack(pady=50)
 
         tk.Label(self.frame, text="Usuario").pack()
         self.usuario = tk.Entry(self.frame)
@@ -20,21 +19,14 @@ class LoginView:
         self.password = tk.Entry(self.frame, show="*")
         self.password.pack()
 
-        self.mensaje = tk.Label(self.frame, text="", fg="red")
-        self.mensaje.pack()
-
-        tk.Button(self.frame, text="Ingresar", command=self.login).pack()
+        tk.Button(self.frame, text="Ingresar", command=self.login).pack(pady=10)
 
     def login(self):
-        user = self.usuario.get()
-        pwd = self.password.get()
-
-        if not user or not pwd:
-            self.mensaje.config(text="Campos vacíos")
-            return
-
-        if self.servicio.validar_usuario(user, pwd):
+        if self.servicio.validar_usuario(
+            self.usuario.get(),
+            self.password.get()
+        ):
             self.frame.destroy()
-            self.mostrar_main()
+            self.on_login()
         else:
-            self.mensaje.config(text="Datos incorrectos")
+            messagebox.showerror("Error", "Datos incorrectos")
