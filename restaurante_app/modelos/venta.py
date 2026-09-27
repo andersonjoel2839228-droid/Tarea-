@@ -1,12 +1,17 @@
-class Venta:
-    def __init__(self, identificacion_usuario, codigo_producto, cantidad):
-        self.identificacion_usuario = identificacion_usuario
-        self.codigo_producto = codigo_producto
-        self.cantidad = cantidad
+from datetime import datetime
 
-    def __str__(self):
-        return (
-            f"Usuario: {self.identificacion_usuario} - "
-            f"Producto: {self.codigo_producto} - "
-            f"Cantidad: {self.cantidad}"
-        )
+
+class Venta:
+    def __init__(self, id, usuario_id, producto_id, fecha=None):
+        self.id = id
+        self.usuario_id = usuario_id
+        self.producto_id = producto_id
+        self.fecha = fecha or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "usuario_id": self.usuario_id,
+            "producto_id": self.producto_id,
+            "fecha": self.fecha
+        }

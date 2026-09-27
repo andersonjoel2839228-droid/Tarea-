@@ -1,6 +1,20 @@
 [
-  {
-    "usuario": "admin",
-    "password": "1234"
-  }
+    {
+        "id": 1,
+        "nombre": "Juan Pérez",
+        "usuario": "juan",
+        "password": "1234"
+    },
+    {
+        "id": 2,
+        "nombre": "María López",
+        "usuario": "maria",
+        "password": "1234"
+    },
+    {
+        "id": 3,
+        "nombre": "Carlos Gómez",
+        "usuario": "carlos",
+        "password": "1234"
+    }
 ]

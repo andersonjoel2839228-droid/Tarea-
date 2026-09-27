@@ -1,17 +1,29 @@
 import tkinter as tk
+
 from servicios.restaurante_servicio import RestauranteServicio
 from ui.login_view import LoginView
 from ui.main_view import MainView
 
-def iniciar():
-    MainView(root, servicio)
 
-root = tk.Tk()
-root.title("Restaurante App")
-root.geometry("700x400")
+def mostrar_principal(usuario):
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    MainView(
+        root,
+        servicio,
+        usuario
+    )
+
 
 servicio = RestauranteServicio()
 
-LoginView(root, servicio, iniciar)
+root = tk.Tk()
+
+LoginView(
+    root,
+    servicio,
+    mostrar_principal
+)
 
 root.mainloop()

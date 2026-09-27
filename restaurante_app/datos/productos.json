@@ -1,7 +1,22 @@
 [
     {
-        "id": "1",
-        "nombre": "pizza",
-        "precio": "10"
+        "id": 1,
+        "nombre": "Hamburguesa",
+        "precio": 5.5
+    },
+    {
+        "id": 2,
+        "nombre": "Pizza",
+        "precio": 8.0
+    },
+    {
+        "id": 3,
+        "nombre": "Ceviche",
+        "precio": 7.5
+    },
+    {
+        "id": 4,
+        "nombre": "Jugo natural",
+        "precio": 2.5
     }
 ]
